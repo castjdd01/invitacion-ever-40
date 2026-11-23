@@ -4,16 +4,46 @@
   const experience = document.getElementById('experience');
   const soundButton = document.getElementById('sound-toggle');
   const soundLabel = document.getElementById('sound-label');
+  const themeMusic = document.getElementById('theme-music');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const fanfare = [
-    [293.66, 0.42], [349.23, 0.38], [440.00, 0.54], [523.25, 0.72],
-    [659.25, 0.4], [587.33, 0.38], [466.16, 0.54], [392.00, 0.72],
-    [349.23, 0.4], [440.00, 0.38], [523.25, 0.54], [783.99, 0.8],
-    [698.46, 0.42], [587.33, 0.4], [523.25, 0.52], [440.00, 0.86],
-  ];
-  let audioContext;
   let musicPlaying = false;
-  let musicLoop;
+
+  function updateMusicButton(state) {
+    const labels = {
+      playing: ['Música activada', 'Silenciar música', 'true'],
+      paused: ['Música apagada', 'Reproducir música', 'false'],
+      blocked: ['Toca para activar', 'Reproducir música', 'false'],
+      unavailable: ['Música no disponible', 'Reintentar música', 'false'],
+    };
+    const [label, ariaLabel, pressed] = labels[state];
+    soundLabel.textContent = label;
+    soundButton.setAttribute('aria-label', ariaLabel);
+    soundButton.setAttribute('aria-pressed', pressed);
+  }
+
+  async function startMusic() {
+    try {
+      await themeMusic.play();
+      musicPlaying = true;
+      updateMusicButton('playing');
+      return true;
+    } catch (error) {
+      musicPlaying = false;
+      updateMusicButton(error.name === 'NotAllowedError' ? 'blocked' : 'unavailable');
+      return false;
+    }
+  }
+
+  function stopMusic() {
+    themeMusic.pause();
+    musicPlaying = false;
+    updateMusicButton('paused');
+  }
+
+  themeMusic.addEventListener('error', () => {
+    musicPlaying = false;
+    updateMusicButton('unavailable');
+  });
 
   const showSections = () => {
     experience.inert = false;
@@ -27,6 +57,7 @@
   };
 
   startButton.addEventListener('click', () => {
+    if (!musicPlaying) void startMusic();
     startButton.disabled = true;
     opening.classList.add('is-leaving');
     window.setTimeout(showSections, reducedMotion ? 0 : 520);
@@ -49,59 +80,13 @@
     items.forEach((item) => observer.observe(item));
   }
 
-  function playTone(frequency, startAt, duration, volume, type = 'triangle') {
-    const oscillator = audioContext.createOscillator();
-    const envelope = audioContext.createGain();
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, startAt);
-    envelope.gain.setValueAtTime(0.0001, startAt);
-    envelope.gain.exponentialRampToValueAtTime(volume, startAt + 0.035);
-    envelope.gain.setValueAtTime(volume, startAt + duration * 0.68);
-    envelope.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
-    oscillator.connect(envelope);
-    envelope.connect(audioContext.destination);
-    oscillator.start(startAt);
-    oscillator.stop(startAt + duration + 0.02);
-  }
-
-  function playFanfare() {
-    if (!musicPlaying || !audioContext) return;
-    const phraseStart = audioContext.currentTime + 0.06;
-    let offset = 0;
-    fanfare.forEach(([frequency, duration], index) => {
-      const noteStart = phraseStart + offset;
-      playTone(frequency, noteStart, duration, 0.075);
-      if (index % 4 === 0) playTone(frequency / 2, noteStart, duration, 0.022, 'sine');
-      offset += duration;
-    });
-    musicLoop = window.setTimeout(playFanfare, (offset + 0.8) * 1000);
-  }
-
-  soundButton.addEventListener('click', async () => {
+  soundButton.addEventListener('click', () => {
     if (musicPlaying) {
-      musicPlaying = false;
-      window.clearTimeout(musicLoop);
-      await audioContext.suspend();
-      soundLabel.textContent = 'Música apagada';
-      soundButton.setAttribute('aria-label', 'Activar música');
-      soundButton.setAttribute('aria-pressed', 'false');
+      stopMusic();
       return;
     }
-
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) throw new Error('Web Audio no disponible');
-      audioContext ||= new AudioContext();
-      await audioContext.resume();
-      musicPlaying = true;
-      soundLabel.textContent = 'Música activada';
-      soundButton.setAttribute('aria-label', 'Silenciar música');
-      soundButton.setAttribute('aria-pressed', 'true');
-      playFanfare();
-    } catch {
-      soundLabel.textContent = 'Música no disponible';
-      soundButton.setAttribute('aria-label', 'Música no disponible');
-      soundButton.disabled = true;
-    }
+    void startMusic();
   });
+
+  void startMusic();
 })();

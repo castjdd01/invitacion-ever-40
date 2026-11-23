@@ -13,7 +13,7 @@ GitHub Pages publica desde la rama main y la carpeta raíz. Los cambios enviados
 
 La invitación inicia con Iniciar misión. Luego puedes seguir la historia o saltar directamente a Ver fecha y lugar. El botón de Olivia Bistro abre Google Maps con una búsqueda por nombre y dirección, sin coordenadas inventadas.
 
-El botón de música activa una fanfarria espacial original sintetizada en el navegador con Web Audio. No descarga pistas ni se reproduce automáticamente; la persona controla el sonido con Música apagada / Música activada. La invitación sigue funcionando si el dispositivo no ofrece Web Audio.
+La invitación intenta reproducir automáticamente `assets/star-wars-main-theme.mp3` al abrir. Algunos navegadores móviles bloquean el audio automático; en ese caso, el botón de música o el primer toque en Iniciar misión lo activan. El botón también permite silenciar y volver a reproducir la pista. En pantallas de 380 px o menos, las tarjetas de fecha y hora se apilan para mantener los datos legibles.
 
 ## Cambiar datos
 

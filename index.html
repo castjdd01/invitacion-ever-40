@@ -26,11 +26,13 @@
 
     <header class="site-header">
       <a class="monogram" href="#inicio" aria-label="Ever Adilson, inicio">EA<span>·</span>XL</a>
-      <button class="sound-toggle" id="sound-toggle" type="button" aria-label="Activar música" aria-pressed="false" title="Activar o silenciar la fanfarria espacial original">
+      <button class="sound-toggle" id="sound-toggle" type="button" aria-label="Reproducir música" aria-pressed="false" title="La música intentará sonar al abrir. Si tu navegador la bloquea, toca aquí o inicia la misión.">
         <span class="sound-icon" aria-hidden="true">♫</span>
-        <span id="sound-label">Música apagada</span>
+        <span id="sound-label">Intentando música</span>
       </button>
     </header>
+
+    <audio id="theme-music" src="assets/star-wars-main-theme.mp3" preload="auto" autoplay loop></audio>
 
     <section class="opening" id="opening" aria-labelledby="opening-title">
       <div class="opening-orbit orbit-one" aria-hidden="true"></div>

@@ -303,6 +303,8 @@ a { color: inherit; }
   .hero::after { inset-inline: 6%; }
   .planet { right: 9%; }
   .ship-silhouette { left: 2%; }
+  .event-grid { grid-template-columns: 1fr; }
+  .date-card, .time-card { min-height: 220px; }
   .event-card { padding: 22px 18px; }
   .place-card { padding: 24px 20px; }
   .site-footer { padding-inline: 20px; font-size: 9px; }
